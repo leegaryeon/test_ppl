@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        const WebSocket = require('ws');
+
+        const server = new WebSocket.Server({ port: 8080 });
+
+        let visitorCount = 0;
+
+        server.on('connection', (socket) => {
+            // 클라이언트가 연결될 때마다 방문자 수를 전송합니다.
+            socket.send(visitorCount.toString());
+
+                // 새로운 방문자가 들어올 때마다 방문자 수를 증가시킵니다.
+                visitorCount++;
+
+                // 모든 클라이언트에게 새로운 방문자 수를 전송합니다.
+                server.clients.forEach((client) => {
+                client.send(visitorCount.toString());
+            });
+        });
+        const socket = new WebSocket('ws://localhost:8080');
+
+        socket.onmessage = (event) => {
+            const visitorCount = parseInt(event.data);
+            document.getElementById('visitor-count').textContent = visitorCount;
+        };
+    </script>
+    <div>
+        <span>Visitors: </span>
+        <span id="visitor-count">0</span>
+      </div>
+      
+</body>
+</html>
